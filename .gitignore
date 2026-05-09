@@ -1,0 +1,18 @@
+# Excel-отчёты
+*.xlsx
+exchange_perms_*
+
+# Логи и debug
+*.log
+scripts/debug_logs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
