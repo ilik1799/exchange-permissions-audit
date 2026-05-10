@@ -46,9 +46,10 @@ py main.py -u j.doe -l CORP\j.doe -d
 |------|----------|
 | `-u` | sAMAccountName проверяемого пользователя |
 | `-l` | Логин для подключения (`DOMAIN\user`) |
-| `-s` | URL PowerShell-эндпоинта Exchange |
+| `-s` | URL PowerShell-эндпоинта Exchange (опц., по умолчанию из `config.py`) |
 | `-t` | Количество параллельных джобов Full Access (1–18) |
 | `-o` | Путь к Excel-отчёту |
+| `-v` | Verbose-режим (DEBUG-логи в консоль) |
 | `-d` | Сохранять debug-лог каждого джоба |
 
 ## Производительность
