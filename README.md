@@ -24,7 +24,7 @@
 ## Архитектура
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph IN["Inputs"]
         CLI["CLI args<br/>-u sAMAccountName<br/>-l DOMAIN form<br/>-t threads"]
         PWD["getpass<br/>(interactive)"]
@@ -40,7 +40,7 @@ flowchart TB
     end
 
     subgraph EXT["External systems"]
-        EXCH[("Exchange<br/>Get-Mailbox")]
+        EXCH[("Exchange<br/>Get-Mailbox<br/>(PSSession Kerberos)")]
         AD[("Active Directory<br/>Get-ACL on DN")]
     end
 
@@ -52,7 +52,7 @@ flowchart TB
     PS --> FA
     PS --> SA
     PS --> SB
-    FA -->|"PSSession (Kerberos)"| EXCH
+    FA --> EXCH
     SA --> AD
     SB --> EXCH
     EXCH --> XLSX
