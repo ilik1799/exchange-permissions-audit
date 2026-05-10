@@ -91,6 +91,12 @@ Python-оркестратор запрашивает пароль интерак
 ## Использование
 
 ```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+```bash
 # Минимально
 py main.py -u j.doe -l CORP\j.doe
 
