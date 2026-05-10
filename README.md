@@ -21,6 +21,65 @@
 - **HashSet с OrdinalIgnoreCase** для O(1)-поиска совпадений ACE.
 - **Excel-отчёт** с маркировкой типа права (`!!`, `!`, `~`).
 
+## Архитектура
+
+```mermaid
+flowchart TB
+    subgraph IN["Inputs"]
+        CLI["CLI args<br/>-u sAMAccountName<br/>-l DOMAIN form<br/>-t threads"]
+        PWD["getpass<br/>(interactive)"]
+    end
+
+    PY["main.py<br/>orchestrator"]
+    PS["check_permissions.ps1<br/>via subprocess"]
+
+    subgraph METHODS["3 permission types"]
+        FA["Full Access<br/>Start-Job 5×"]
+        SA["Send-As<br/>Get-ACL on DN"]
+        SB["Send on Behalf<br/>GrantSendOnBehalfTo"]
+    end
+
+    subgraph EXT["External systems"]
+        EXCH[("Exchange<br/>Get-Mailbox")]
+        AD[("Active Directory<br/>Get-ACL on DN")]
+    end
+
+    XLSX["Excel report<br/>marked !! ! ~"]
+
+    CLI --> PY
+    PWD --> PY
+    PY --> PS
+    PS --> FA
+    PS --> SA
+    PS --> SB
+    FA -->|"PSSession (Kerberos)"| EXCH
+    SA --> AD
+    SB --> EXCH
+    EXCH --> XLSX
+    AD --> XLSX
+
+    classDef in fill:#1f6feb,stroke:#1f6feb,color:#fff
+    classDef core fill:#8957e5,stroke:#8957e5,color:#fff
+    classDef method fill:#bf8700,stroke:#bf8700,color:#fff
+    classDef ext fill:#57606a,stroke:#57606a,color:#fff
+    classDef out fill:#1a7f37,stroke:#1a7f37,color:#fff
+    class CLI,PWD in
+    class PY,PS core
+    class FA,SA,SB method
+    class EXCH,AD ext
+    class XLSX out
+```
+
+Python-оркестратор запрашивает пароль интерактивно и через `subprocess`
+запускает локальный PowerShell-скрипт. Скрипт устанавливает PSSession
+к Exchange по Kerberos, после чего собирает 3 типа прав параллельными
+методами: Full Access через `Start-Job` (по умолчанию 5 потоков, каждый
+со своей PSSession), Send-As через `Get-ACL` на DN объекта в AD напрямую
+(быстрее `Get-ADPermission`), Send on Behalf через атрибут
+`GrantSendOnBehalfTo` из `Get-Mailbox`. Результат сводится в Excel-отчёт
+с цветовой маркировкой типов прав (`!!` Full Access, `!` Send-As,
+`~` Send on Behalf).
+
 ## Хранение секретов
 
 Пароль учётной записи запрашивается через **`getpass.getpass()`** при
